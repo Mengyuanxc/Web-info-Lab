@@ -3,6 +3,7 @@ from time import sleep
 import os.path
 import requests
 from bs4 import BeautifulSoup
+import json
 
 
 def save_movie_details(movie_id, file_path):
@@ -38,18 +39,28 @@ def save_movie_details(movie_id, file_path):
     release_date = release_date_element.text.strip() if release_date_element else ""
 
     # 获取电影简介
-    summary_element = soup.select_one('span[property="v:summary"]')
-    summary = summary_element.text.strip() if summary_element else ""
-
+    # summary_element = soup.select_one('span[property="v:summary"]')
+    # summary = summary_element.text.strip() if summary_element else ""
+    full_summary_element = soup.find('span', class_='all hidden')
+    if(full_summary_element):
+        summary = soup.find('span', class_='all hidden').get_text(strip=True)
+    else:
+        summary_element = soup.select_one('span[property="v:summary"]')
+        summary = summary_element.text.strip() if summary_element else ""
+        summary = summary.replace("\n", "").replace(" ", "")
     # 将结果保存到文件
-    with open(file_path, 'w', encoding='utf-8') as f:
-        f.write('标题: ' + title + '\n')
-        f.write('评分: ' + rating + '\n')
-        f.write('导演: ' + ', '.join(directors) + '\n')
-        f.write('演员: ' + ', '.join(actors) + '\n')
-        f.write('类型: ' + ', '.join(genres) + '\n')
-        f.write('上映日期: ' + release_date + '\n')
-        f.write('简介: ' + summary + '\n')
+    with open(file_path, 'w', encoding='utf-8') as file:
+        movie_details = {
+            "title": title,
+            "rating": rating,
+            "directors": directors,
+            "actors": actors,
+            "genres": genres,
+            "release_date": release_date,
+            "summary": summary
+        }
+        movie_details_json = json.dumps(movie_details, ensure_ascii=False)
+        file.write(movie_details_json)
 
 
 if __name__ == '__main__':
@@ -59,7 +70,7 @@ if __name__ == '__main__':
         while line:
             name = 'details/movie_details_'
             name += line[:-1]
-            name += '.txt'
+            name += '.json'
             print(line)
             if os.path.exists(name):
                 line = f.readline()
