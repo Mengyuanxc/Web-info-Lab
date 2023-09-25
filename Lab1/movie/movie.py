@@ -15,12 +15,14 @@ def save_movie_details(movie_id, file_path):
     soup = BeautifulSoup(response.text, 'html.parser')
 
     # 获取电影标题
+    chinese_title = soup.title.get_text().strip()[:-5]
     title_element = soup.select_one('h1 span[property="v:itemreviewed"]')
     title = title_element.text.strip() if title_element else ""
 
     # 获取电影评分
     rating_element = soup.select_one('strong.ll.rating_num')
     rating = rating_element.text.strip() if rating_element else ""
+    rating = float(rating)
 
     # 获取导演
     director_elements = soup.select('a[rel="v:directedBy"]')
@@ -48,16 +50,29 @@ def save_movie_details(movie_id, file_path):
         summary_element = soup.select_one('span[property="v:summary"]')
         summary = summary_element.text.strip() if summary_element else ""
         summary = summary.replace("\n", "").replace(" ", "")
+
+    # 喜欢这部电影的人也喜欢...
+    recommendation_list = []
+    recommendation_element = soup.find('div', class_='recommendations-bd')
+    dl_tags = recommendation_element.find_all('dl')
+    for dl in dl_tags:
+        dd_tag = dl.find('dd')
+        a_tag = dd_tag.find('a')
+        recommendation_movie_name = a_tag.get_text()
+        recommendation_list.append(recommendation_movie_name)
+
     # 将结果保存到文件
     with open(file_path, 'w', encoding='utf-8') as file:
         movie_details = {
+            "chinese_title": chinese_title,
             "title": title,
             "rating": rating,
             "directors": directors,
             "actors": actors,
             "genres": genres,
             "release_date": release_date,
-            "summary": summary
+            "summary": summary,
+            "also_like": recommendation_list
         }
         movie_details_json = json.dumps(movie_details, ensure_ascii=False)
         file.write(movie_details_json)
