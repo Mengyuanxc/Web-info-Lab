@@ -89,13 +89,13 @@ if __name__ == '__main__':
 # 调用函数并输入豆瓣电影的ID和文件路径
     name = "Movie_details.csv"
     cnt = 0
-    with open(name, 'r', encoding='utf-8') as f:
+    with open(name, 'r', encoding='utf-8') as f:   #跳过已经爬下的部分
         line = f.readline()
         while(line):
             cnt+= 1
             line = f.readline()
 
-    with open('Movie_id.csv', 'r') as f:
+    with open('Movie_id.csv', 'r') as f:        #根据ID爬取对应电影
         line = f.readline()
         while(cnt>0):
             cnt-=1
