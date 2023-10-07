@@ -4,7 +4,7 @@ import os.path
 import requests
 from bs4 import BeautifulSoup
 import json
-
+import csv
 
 def save_movie_details(movie_id, file_path):
     url = f'https://movie.douban.com/subject/{movie_id}/'
@@ -21,8 +21,9 @@ def save_movie_details(movie_id, file_path):
 
     # 获取电影评分
     rating_element = soup.select_one('strong.ll.rating_num')
-    rating = rating_element.text.strip() if rating_element else ""
-    rating = float(rating)
+    rating = rating_element.text.strip() if rating_element else "无"
+    if(rating!="无"):
+        rating = float(rating)
 
     # 获取导演
     director_elements = soup.select('a[rel="v:directedBy"]')
@@ -54,7 +55,7 @@ def save_movie_details(movie_id, file_path):
     # 喜欢这部电影的人也喜欢...
     recommendation_list = []
     recommendation_element = soup.find('div', class_='recommendations-bd')
-    dl_tags = recommendation_element.find_all('dl')
+    dl_tags = recommendation_element.find_all('dl') if recommendation_element else ""
     for dl in dl_tags:
         dd_tag = dl.find('dd')
         a_tag = dd_tag.find('a')
@@ -62,34 +63,45 @@ def save_movie_details(movie_id, file_path):
         recommendation_list.append(recommendation_movie_name)
 
     # 将结果保存到文件
-    with open(file_path, 'w', encoding='utf-8') as file:
-        movie_details = {
-            "chinese_title": chinese_title,
-            "title": title,
-            "rating": rating,
-            "directors": directors,
-            "actors": actors,
-            "genres": genres,
-            "release_date": release_date,
-            "summary": summary,
-            "also_like": recommendation_list
-        }
-        movie_details_json = json.dumps(movie_details, ensure_ascii=False)
-        file.write(movie_details_json)
+    with open(file_path, 'a', encoding='utf-8',newline="") as file:
+        # 2. 基于文件对象构建 csv写入对象
+        csv_writer = csv.writer(file)
+        # 4. 写入csv文件内容
+        z = [
+            movie_id,
+            chinese_title,
+            title,
+            rating,
+            directors,
+            actors,
+            genres,
+            release_date,
+            summary,
+            recommendation_list
+        ]
+        csv_writer.writerow(z)
+        print("写入数据成功")
+        # 5. 关闭文件
+        file.close()
 
 
 if __name__ == '__main__':
 # 调用函数并输入豆瓣电影的ID和文件路径
-    with open('Movie_id.csv', 'r') as f:
+    name = "Movie_details.csv"
+    cnt = 0
+    with open(name, 'r', encoding='utf-8') as f:   #跳过已经爬下的部分
         line = f.readline()
+        while(line):
+            cnt+= 1
+            line = f.readline()
+
+    with open('Movie_id.csv', 'r') as f:        #根据ID爬取对应电影
+        line = f.readline()
+        while(cnt>0):
+            cnt-=1
+            line = f.readline()
         while line:
-            name = 'details/movie_details_'
-            name += line[:-1]
-            name += '.json'
             print(line)
-            if os.path.exists(name):
-                line = f.readline()
-                continue
             save_movie_details(line[:-1], name)
             line = f.readline()
-            sleep(random.randint(10, 20))
+            #sleep(random.randint(20, 40))
