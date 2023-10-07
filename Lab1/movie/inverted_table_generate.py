@@ -8,7 +8,7 @@ index_list = []         #记录单词的位置
 inverted_table = []     #倒排表
 keyword_file = "Movie_word_segmentation_jieba.csv"
 index_list_file = "index_list_file.txt"     #存储单词位置表
-inverted_table_file = "inverted_table_file.txt"         #存储倒排表
+inverted_table_file = "inverted_table_file"         #存储倒排表
 
 with open (index_list_file, 'w', encoding='utf-8') as output_file_1:
     with open(keyword_file, 'r', encoding='utf-8') as input_file:
