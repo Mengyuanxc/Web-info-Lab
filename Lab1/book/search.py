@@ -62,13 +62,13 @@ for and_word in keyword:    #开始解析
             for index_of_movie in inverted_table[index_of_table]:       #给每一项加分
                 cnt_temp[index_of_movie] += 1
                 #print(index_of_movie)
-    for i in range(0,movie_num):     #更新每部电影分数
+    for i in range(0,movie_num):     #更新每部书籍分数
         temp_score = 100*cnt_temp[i]/cnt
         if (temp_score>final_score[i]):
             final_score[i] = temp_score
 
-judge = False           #没有电影匹配
-for j in range(0,movie_num):            #检测是否有电影匹配
+judge = False           #没有书籍匹配
+for j in range(0,movie_num):            #检测是否有书籍匹配
     if (final_score[j] > 0.0):
         judge = True
 
@@ -78,7 +78,7 @@ if judge == False:
 
 else:
     movie_information = []
-    movie_file = "Book_details.csv"            #电影文件
+    movie_file = "Book_details.csv"            #书籍文件
     with open(movie_file, 'r', encoding='utf-8') as input_file:
         csv_reader = csv.reader(input_file)
         for row in csv_reader:
@@ -86,10 +86,10 @@ else:
     print("以下为最符合检索条件的"+str(list_num)+"部书籍:")
     for i in range(0,list_num):
         max_score = max(final_score)
-        if(max_score == 0.0):                 #没有匹配的电影了
+        if(max_score == 0.0):                 #没有匹配的书籍
             print("已无匹配的书籍")
             exit(0)
-        max_idx = final_score.index(max_score)       #定位最高匹配电影下标
+        max_idx = final_score.index(max_score)       #定位最高匹配书籍下标
         print(movie_information[max_idx][1],end='， ')
         print("匹配度为:"+str(max_score))
         final_score[max_idx] = 0
