@@ -53,7 +53,7 @@ while True:
 
 #print(keyword)
 for and_word in keyword:    #开始解析
-    cnt  = 0
+    cnt = 0
     cnt_temp = [0]*movie_num     #记录and关键词命中数
     for word in and_word:
         cnt += 1
