@@ -17,6 +17,30 @@ with open (index_list_file, 'r', encoding='utf-8') as input_file_1:
 
 inverted_table = file_readwrite.Read_list(inverted_table_file)
 
+
+def getSym(aimWord, wordSet):
+    result = []
+    for words in wordSet:
+        for word in words:
+            if aimWord == word:
+                result.append(words)
+                break
+    return result
+
+
+f = open('dict_synonym.txt', 'r')
+lines = f.readlines()
+sym_words = []
+# sym_class_words = []
+# 从txt中获取词条，构建同义词词集sym_words和相关词词集sym_class_words
+for line in lines:
+    line = line.replace('\n','')
+    items = line.split(' ')
+    index = items[0]
+    if index[-1] == '=':
+        sym_words.append(items[1:])
+    # if index[-1] == '#':
+    #    sym_class_words.append(items[1:])
 '''
 print(index_list)
 print(inverted_table)
@@ -53,19 +77,39 @@ while True:
 
 #print(keyword)
 for and_word in keyword:    #开始解析
-    cnt  = 0
+    cnt  = len(and_word)
     cnt_temp = [0]*movie_num     #记录and关键词命中数
-    for word in and_word:
-        cnt += 1
-        if word in index_list:          #关键词存在
-            index_of_table = index_list.index(word)     #定位倒排表
-            for index_of_movie in inverted_table[index_of_table]:       #给每一项加分
-                cnt_temp[index_of_movie] += 1
-                #print(index_of_movie)
-    for i in range(0,movie_num):     #更新每部书籍分数
-        temp_score = 100*cnt_temp[i]/cnt
-        if (temp_score>final_score[i]):
-            final_score[i] = temp_score
+    if and_word[0] == 'NOT':
+        cnt -= 1
+        for id in range(1, cnt+1):
+            word = and_word[id]
+            flag = False
+            for element in index_list:
+                if word in getSym(element, sym_words):
+                    flag = True
+                    break
+            if flag:          #关键词存在
+                index_of_table = index_list.index(word)     #定位倒排表
+                for index_of_book in inverted_table[index_of_table]:       #给每一项加分
+                    cnt_temp[index_of_book] += 1
+                    #print(index_of_movie)
+        for i in range(0,movie_num):     #更新每部书籍分数
+            cnt_temp[i] = cnt - cnt_temp[i] #not项分数反转
+            temp_score = 100*cnt_temp[i]/cnt
+            if (temp_score>final_score[i]):
+                final_score[i] = temp_score
+    else:
+        for id in range(0, cnt):
+            word = and_word[id]
+            if word in index_list:          #关键词存在
+                index_of_table = index_list.index(word)     #定位倒排表
+                for index_of_movie in inverted_table[index_of_table]:       #给每一项加分
+                    cnt_temp[index_of_movie] += 1
+                    #print(index_of_movie)
+        for i in range(0,movie_num):     #更新每部书籍分数
+            temp_score = 100*cnt_temp[i]/cnt
+            if (temp_score>final_score[i]):
+                final_score[i] = temp_score
 
 judge = False           #没有书籍匹配
 for j in range(0,movie_num):            #检测是否有书籍匹配
