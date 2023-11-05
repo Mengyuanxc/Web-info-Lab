@@ -4,19 +4,42 @@ import file_readwrite
 from book_word_segmentation import get_string
 import csv
 
-index_list_file = "index_list_file.txt"     #存储单词位置表
+index_list_file = "index_list_file"     #存储单词位置表
 inverted_table_file = "inverted_table_file"         #存储倒排表
-index_list = []
+#index_list = []
 list_num = 10                           #每次搜索显示最匹配的前10项
-movie_num = 1200                        #电影总数量
+book_num = 1200                        #电影总数量
 
-with open (index_list_file, 'r', encoding='utf-8') as input_file_1:
-    str_read = input_file_1.readline()          #单词——倒排表项索引表
-    get_string(index_list, str_read)
-    input_file_1.close()
+#with open (index_list_file, 'r', encoding='utf-8') as input_file_1:
+    #str_read = input_file_1.readline()          #单词——倒排表项索引表
+    #get_string(index_list, str_read)
+    #input_file_1.close()
+index_list = file_readwrite.Read_list_str(index_list_file)
 
 inverted_table = file_readwrite.Read_list(inverted_table_file)
 
+
+def getSym(aimWord, wordSet):
+    result = []
+    for words in wordSet:
+        for word in words:
+            if aimWord == word:
+                return words
+    return [aimWord]
+
+f = open('dict_synonym.txt', 'r', encoding='utf-8')
+lines = f.readlines()
+sym_words = []
+# sym_class_words = []
+# 从txt中获取词条，构建同义词词集sym_words和相关词词集sym_class_words
+for line in lines:
+    line = line.replace('\n','')
+    items = line.split(' ')
+    index = items[0]
+    if index[-1] == '=':
+        sym_words.append(items[1:])
+    # if index[-1] == '#':
+    #    sym_class_words.append(items[1:])
 '''
 print(index_list)
 print(inverted_table)
@@ -36,8 +59,9 @@ print(max)
 
 ##读入搜索，采用主析取范式的方式来记录搜索
 keyword = []        #记录关键词
-final_score = [0.0]*movie_num        #记录每一项得分
-cnt_temp = [0]*movie_num             #记录当前命中数
+final_score = [0.0]*book_num        #记录每一项得分
+cnt_temp = [0]*book_num             #记录当前命中数
+cnt_temp_NOT = [0]*book_num         #记录not项命中数
 #得分计算方式为: 多个or式中最高者，每个分式分数计算为:记录命中项数N和总项数M，最终得分为100*N/M
 
 while True:
@@ -52,23 +76,42 @@ while True:
     print("多次输入的关键词bool式采用or连接")
 
 #print(keyword)
-for and_word in keyword:    #开始解析
-    cnt  = 0
-    cnt_temp = [0]*movie_num     #记录and关键词命中数
-    for word in and_word:
-        cnt += 1
-        if word in index_list:          #关键词存在
-            index_of_table = index_list.index(word)     #定位倒排表
-            for index_of_movie in inverted_table[index_of_table]:       #给每一项加分
-                cnt_temp[index_of_movie] += 1
-                #print(index_of_movie)
-    for i in range(0,movie_num):     #更新每部书籍分数
-        temp_score = 100*cnt_temp[i]/cnt
-        if (temp_score>final_score[i]):
+for and_word in keyword :    #开始解析
+    cnt = len(and_word)
+    i = 0
+    cnt_NOT = 0
+    cnt_temp = [0]*book_num     #记录and关键词命中数
+    cnt_temp_NOT = [0]*book_num     #记录and关键词命中数
+    while i < cnt:
+        word = and_word[i]
+        reverse = False
+        index_of_table = -1
+        if word == 'NOT':
+            reverse = True
+            word = and_word[i+1]
+            cnt_NOT += 1
+        for word_set in index_list:
+            if word in word_set:
+                index_of_table = index_list.index(word_set)
+                break
+        if index_of_table != -1:          #关键词存在
+            for index_of_book in inverted_table[index_of_table]:       #给每一项加分
+                if reverse:
+                    cnt_temp_NOT[index_of_book] += 1
+                else:
+                    cnt_temp[index_of_book] += 1
+                #print(index_of_book)
+        if reverse:
+            i += 2
+        else:
+            i += 1
+    for i in range(0, book_num):     #更新每部电影分数
+        temp_score = 100*(cnt_temp[i]+cnt_NOT-cnt_temp_NOT[i])/(cnt-cnt_NOT)
+        if temp_score>final_score[i]:
             final_score[i] = temp_score
 
 judge = False           #没有书籍匹配
-for j in range(0,movie_num):            #检测是否有书籍匹配
+for j in range(0, book_num):            #检测是否有书籍匹配
     if (final_score[j] > 0.0):
         judge = True
 
