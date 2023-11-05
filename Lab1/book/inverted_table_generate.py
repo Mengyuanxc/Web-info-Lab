@@ -15,11 +15,13 @@ def getSym(aimWord, wordSet):
 
 index_list = []         #记录单词的位置
 inverted_table = []     #倒排表
+symword_set = []        #同义/近义词表
 keyword_file = "Book_word_segmentation_jieba.csv"
 index_list_file = "index_list_file.txt"     #存储单词位置表
 inverted_table_file = "inverted_table_file"         #存储倒排表
 
 f = open('dict_synonym.txt', 'r',encoding='utf-8')
+
 lines = f.readlines()
 sym_words = []
 # sym_class_words = []
@@ -32,6 +34,7 @@ for line in lines:
         sym_words.append(items[1:])
     # if index[-1] == '#':
     #    sym_class_words.append(items[1:])
+    
 f.close()
 
 with open (index_list_file, 'w', encoding='utf-8') as output_file_1:
@@ -49,6 +52,7 @@ with open (index_list_file, 'w', encoding='utf-8') as output_file_1:
                         word_index = i
                         break
                     i += 1
+
                 if word_index != -1:          #关键词已在倒排表中
                     if inverted_table[word_index][-1] != index:
                         inverted_table[word_index].append(index)

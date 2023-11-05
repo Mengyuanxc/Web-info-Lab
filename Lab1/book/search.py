@@ -28,6 +28,7 @@ def getSym(aimWord, wordSet):
     return [aimWord]
 
 f = open('dict_synonym.txt', 'r', encoding='utf-8')
+
 lines = f.readlines()
 sym_words = []
 # sym_class_words = []
@@ -76,6 +77,7 @@ while True:
     print("多次输入的关键词bool式采用or连接")
 
 #print(keyword)
+
 for and_word in keyword :    #开始解析
     cnt = len(and_word)
     i = 0
@@ -83,6 +85,7 @@ for and_word in keyword :    #开始解析
     cnt_temp = [0]*book_num     #记录and关键词命中数
     cnt_temp_NOT = [0]*book_num     #记录and关键词命中数
     while i < cnt:
+
         word = and_word[i]
         reverse = False
         index_of_table = -1
@@ -93,6 +96,7 @@ for and_word in keyword :    #开始解析
         for word_set in index_list:
             if word in word_set:
                 index_of_table = index_list.index(word_set)
+
                 break
         if index_of_table != -1:          #关键词存在
             for index_of_book in inverted_table[index_of_table]:       #给每一项加分
@@ -105,6 +109,7 @@ for and_word in keyword :    #开始解析
             i += 2
         else:
             i += 1
+
     for i in range(0, book_num):     #更新每部电影分数
         temp_score = 100*(cnt_temp[i]+cnt_NOT-cnt_temp_NOT[i])/(cnt-cnt_NOT)
         if temp_score>final_score[i]:
