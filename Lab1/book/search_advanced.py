@@ -6,7 +6,7 @@ import csv
 import time
 
 index_list_file = "index_list_file"     #存储单词位置表
-inverted_table_file = "inverted_table_file"         #存储倒排表
+inverted_table_file = "inverted_table_gap"         #存储倒排表
 #index_list = []
 list_num = 10                           #每次搜索显示最匹配的前10项
 book_num = 1200                        #电影总数量
@@ -17,7 +17,35 @@ book_num = 1200                        #电影总数量
     #input_file_1.close()
 index_list = file_readwrite.Read_list_str(index_list_file)
 
-inverted_table = file_readwrite.Read_list(inverted_table_file)
+inverted_table = []
+ITG = open(inverted_table_file+'.txt', 'rb')
+ch = ITG.read(1)
+cnt = -1
+ready = False
+first = True
+num = 0
+total = 0
+while ch:
+    if not ready:
+        inverted_table.append([])
+        cnt += 1
+        ready = True
+        total = 0
+    number = ord(ch)
+    if number > 127:
+        if first:
+            first = False
+        else:
+            if num > 1200:
+                ready = False
+            else:
+                total += num
+                inverted_table[cnt].append(total)
+        num = number - 128
+    else:
+        num = num*128 + number
+    ch = ITG.read(1)
+ITG.close()
 
 
 def getSym(aimWord, wordSet):
@@ -27,6 +55,7 @@ def getSym(aimWord, wordSet):
             if aimWord == word:
                 return words
     return [aimWord]
+
 
 f = open('dict_synonym.txt', 'r', encoding='utf-8')
 

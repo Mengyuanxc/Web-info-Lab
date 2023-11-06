@@ -3,6 +3,7 @@
 import file_readwrite
 from movie_word_segmentation import get_string
 import csv
+import time
 
 index_list_file = "index_list_file"     #存储单词位置表
 inverted_table_file = "inverted_table_file"         #存储倒排表
@@ -76,6 +77,7 @@ while True:
     print("多次输入的关键词bool式采用or连接")
 
 #print(keyword)
+begin = time.time()
 for and_word in keyword :    #开始解析
     cnt = len(and_word)
     i = 0
@@ -136,3 +138,6 @@ else:
         print(movie_information[max_idx][1],end='， ')
         print("匹配度为:"+str(max_score))
         final_score[max_idx] = 0
+
+end = time.time()
+print('\n用时', end-begin, 's')

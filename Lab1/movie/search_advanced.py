@@ -1,15 +1,15 @@
 ##根据给定关键词检索倒排表进行搜索
 
 import file_readwrite
-from book_word_segmentation import get_string
+from movie_word_segmentation import get_string
 import csv
 import time
 
 index_list_file = "index_list_file"     #存储单词位置表
-inverted_table_file = "inverted_table_file"         #存储倒排表
+inverted_table_file = "inverted_table_gap"         #存储倒排表
 #index_list = []
 list_num = 10                           #每次搜索显示最匹配的前10项
-book_num = 1200                        #电影总数量
+movie_num = 1200                        #电影总数量
 
 #with open (index_list_file, 'r', encoding='utf-8') as input_file_1:
     #str_read = input_file_1.readline()          #单词——倒排表项索引表
@@ -17,7 +17,35 @@ book_num = 1200                        #电影总数量
     #input_file_1.close()
 index_list = file_readwrite.Read_list_str(index_list_file)
 
-inverted_table = file_readwrite.Read_list(inverted_table_file)
+inverted_table = []
+ITG = open(inverted_table_file+'.txt', 'rb')
+ch = ITG.read(1)
+cnt = -1
+ready = False
+first = True
+num = 0
+total = 0
+while ch:
+    if not ready:
+        inverted_table.append([])
+        cnt += 1
+        ready = True
+        total = 0
+    number = ord(ch)
+    if number > 127:
+        if first:
+            first = False
+        else:
+            if num > 1200:
+                ready = False
+            else:
+                total += num
+                inverted_table[cnt].append(total)
+        num = number - 128
+    else:
+        num = num*128 + number
+    ch = ITG.read(1)
+ITG.close()
 
 
 def getSym(aimWord, wordSet):
@@ -27,6 +55,7 @@ def getSym(aimWord, wordSet):
             if aimWord == word:
                 return words
     return [aimWord]
+
 
 f = open('dict_synonym.txt', 'r', encoding='utf-8')
 
@@ -61,9 +90,9 @@ print(max)
 
 ##读入搜索，采用主析取范式的方式来记录搜索
 keyword = []        #记录关键词
-final_score = [0.0]*book_num        #记录每一项得分
-cnt_temp = [0]*book_num             #记录当前命中数
-cnt_temp_NOT = [0]*book_num         #记录not项命中数
+final_score = [0.0]*movie_num        #记录每一项得分
+cnt_temp = [0]*movie_num             #记录当前命中数
+cnt_temp_NOT = [0]*movie_num         #记录not项命中数
 #得分计算方式为: 多个or式中最高者，每个分式分数计算为:记录命中项数N和总项数M，最终得分为100*N/M
 
 while True:
@@ -83,8 +112,8 @@ for and_word in keyword :    #开始解析
     cnt = len(and_word)
     i = 0
     cnt_NOT = 0
-    cnt_temp = [0]*book_num     #记录and关键词命中数
-    cnt_temp_NOT = [0]*book_num     #记录and关键词命中数
+    cnt_temp = [0]*movie_num     #记录and关键词命中数
+    cnt_temp_NOT = [0]*movie_num     #记录and关键词命中数
     while i < cnt:
 
         word = and_word[i]
@@ -100,24 +129,24 @@ for and_word in keyword :    #开始解析
 
                 break
         if index_of_table != -1:          #关键词存在
-            for index_of_book in inverted_table[index_of_table]:       #给每一项加分
+            for index_of_movie in inverted_table[index_of_table]:       #给每一项加分
                 if reverse:
-                    cnt_temp_NOT[index_of_book] += 1
+                    cnt_temp_NOT[index_of_movie] += 1
                 else:
-                    cnt_temp[index_of_book] += 1
-                #print(index_of_book)
+                    cnt_temp[index_of_movie] += 1
+                #print(index_of_movie)
         if reverse:
             i += 2
         else:
             i += 1
 
-    for i in range(0, book_num):     #更新每部电影分数
+    for i in range(0, movie_num):     #更新每部电影分数
         temp_score = 100*(cnt_temp[i]+cnt_NOT-cnt_temp_NOT[i])/(cnt-cnt_NOT)
         if temp_score>final_score[i]:
             final_score[i] = temp_score
 
 judge = False           #没有书籍匹配
-for j in range(0, book_num):            #检测是否有书籍匹配
+for j in range(0, movie_num):            #检测是否有书籍匹配
     if (final_score[j] > 0.0):
         judge = True
 
@@ -127,18 +156,18 @@ if judge == False:
 
 else:
     movie_information = []
-    movie_file = "Book_details.csv"            #书籍文件
+    movie_file = "Movie_details.csv"            #书籍文件
     with open(movie_file, 'r', encoding='utf-8') as input_file:
         csv_reader = csv.reader(input_file)
         for row in csv_reader:
             movie_information.append(row)
-    print("以下为最符合检索条件的"+str(list_num)+"部书籍:")
+    print("以下为最符合检索条件的"+str(list_num)+"部电影:")
     for i in range(0,list_num):
         max_score = max(final_score)
-        if(max_score == 0.0):                 #没有匹配的书籍
-            print("已无匹配的书籍")
+        if(max_score == 0.0):                 #没有匹配的电影
+            print("已无匹配的电影")
             exit(0)
-        max_idx = final_score.index(max_score)       #定位最高匹配书籍下标
+        max_idx = final_score.index(max_score)       #定位最高匹配电影下标
         print(movie_information[max_idx][1],end='， ')
         print("匹配度为:"+str(max_score))
         final_score[max_idx] = 0
