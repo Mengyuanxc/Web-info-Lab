@@ -6,7 +6,7 @@ import csv
 import time
 
 index_list_file = "index_list_file"     #存储单词位置表
-inverted_table_file = "inverted_table_file"         #存储倒排表
+inverted_table_file = "inverted_table_gap"         #存储倒排表
 #index_list = []
 list_num = 10                           #每次搜索显示最匹配的前10项
 movie_num = 1200                        #电影总数量
@@ -17,7 +17,35 @@ movie_num = 1200                        #电影总数量
     #input_file_1.close()
 index_list = file_readwrite.Read_list_str(index_list_file)
 
-inverted_table = file_readwrite.Read_list(inverted_table_file)
+inverted_table = []
+ITG = open(inverted_table_file+'.txt', 'rb')
+ch = ITG.read(1)
+cnt = -1
+ready = False
+first = True
+num = 0
+total = 0
+while ch:
+    if not ready:
+        inverted_table.append([])
+        cnt += 1
+        ready = True
+        total = 0
+    number = ord(ch)
+    if number > 127:
+        if first:
+            first = False
+        else:
+            if num > 1200:
+                ready = False
+            else:
+                total += num
+                inverted_table[cnt].append(total)
+        num = number - 128
+    else:
+        num = num*128 + number
+    ch = ITG.read(1)
+ITG.close()
 
 
 def getSym(aimWord, wordSet):
@@ -28,7 +56,9 @@ def getSym(aimWord, wordSet):
                 return words
     return [aimWord]
 
+
 f = open('dict_synonym.txt', 'r', encoding='utf-8')
+
 lines = f.readlines()
 sym_words = []
 # sym_class_words = []
@@ -85,6 +115,7 @@ for and_word in keyword :    #开始解析
     cnt_temp = [0]*movie_num     #记录and关键词命中数
     cnt_temp_NOT = [0]*movie_num     #记录and关键词命中数
     while i < cnt:
+
         word = and_word[i]
         reverse = False
         index_of_table = -1
@@ -95,6 +126,7 @@ for and_word in keyword :    #开始解析
         for word_set in index_list:
             if word in word_set:
                 index_of_table = index_list.index(word_set)
+
                 break
         if index_of_table != -1:          #关键词存在
             for index_of_movie in inverted_table[index_of_table]:       #给每一项加分
@@ -107,23 +139,24 @@ for and_word in keyword :    #开始解析
             i += 2
         else:
             i += 1
+
     for i in range(0, movie_num):     #更新每部电影分数
         temp_score = 100*(cnt_temp[i]+cnt_NOT-cnt_temp_NOT[i])/(cnt-cnt_NOT)
         if temp_score>final_score[i]:
             final_score[i] = temp_score
 
-judge = False           #没电影匹配
-for j in range(0, movie_num):            #检测是否有电影匹配
+judge = False           #没有书籍匹配
+for j in range(0, movie_num):            #检测是否有书籍匹配
     if (final_score[j] > 0.0):
         judge = True
 
 if judge == False:
-    print("未能检索到符合条件的电影")
+    print("未能检索到符合条件的书籍")
 
 
 else:
     movie_information = []
-    movie_file = "Movie_details.csv"            #电影文件
+    movie_file = "Movie_details.csv"            #书籍文件
     with open(movie_file, 'r', encoding='utf-8') as input_file:
         csv_reader = csv.reader(input_file)
         for row in csv_reader:
