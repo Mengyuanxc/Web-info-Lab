@@ -46,8 +46,8 @@ for row in range(0, len(rating)):
         var_random_guess += (random_guess_rating - real_rating) ** 2
         if cnt % 10 == 0:
             print(cnt, var_predict / cnt, var_random_guess / cnt)
-        # if cnt == 10000:
-        #     break
+        if cnt == 20000:
+            break
 var_predict = var_predict / cnt
 var_random_guess = var_random_guess / cnt
 print(var_predict, var_random_guess)
