@@ -2,6 +2,7 @@ import os
 import random
 import pandas as pd
 import numpy as np
+from sklearn.metrics import ndcg_score
 
 
 def load_data_from_path(data_path, embedding, cache_dir):
@@ -62,9 +63,16 @@ def predict_score(user_id, item_id, rating_matrix, user_similarity_matrix):
         numerator += similarity * item_rating
         denominator += similarity
 
-    final_rating = numerator / denominator
+    if denominator != 0:
+        final_rating = numerator / denominator
+    else:
+        final_rating = 2.5
     return round(final_rating, 2)
 
 
+def compute_ndcg(group):
+    true_ratings = group['true'].tolist()
+    pred_ratings = group['pred'].tolist()
+    return ndcg_score([true_ratings], [pred_ratings], k=50)
 
 
