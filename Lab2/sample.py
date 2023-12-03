@@ -1,6 +1,5 @@
 import json
 
-import filelock
 
 original_dict = None
 
@@ -27,7 +26,7 @@ for movie in original_dict:
             available_relationship.add(relationship)
         child_count_map.setdefault(child_entity, 0)
         child_count_map[child_entity] += 1
-        if child_count_map[child_entity] > entity_core:
+        if child_count_map[child_entity] >= entity_core:
             available_child_entity.add(child_entity)
 
 # print(available_child_entity)

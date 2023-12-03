@@ -3,6 +3,7 @@ import csv
 import json
 from tqdm import tqdm
 
+
 def get_gzip_file_line_count(file_path):
     line_count = 0
     with gzip.open(file_path, "rb") as file:
@@ -31,11 +32,11 @@ with open("data/Movie_id.csv", "r") as movie_id_csv:
 
 movie_triplet_dict = {}
 line_count = 395577070
-### line_count = get_gzip_file_line_count('data/freebase_douban.gz')
-### print(line_count)
+# line_count = get_gzip_file_line_count('data/freebase_douban.gz')
+# print(line_count)
 
 with gzip.open('data/freebase_douban.gz', 'rb') as f:
-    for line_num, line in tqdm(enumerate(f, start=1), total = line_count):
+    for line_num, line in tqdm(enumerate(f, start=1), total=line_count):
         line = line.strip()
         triplet = line.decode().split('\t')[:3]
         mid = triplet[0].split('/')[-1][:-1]
