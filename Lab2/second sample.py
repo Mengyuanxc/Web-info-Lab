@@ -1,7 +1,8 @@
 import gzip
 from tqdm import tqdm
 import json
-
+# 第二次筛选，原理同sample.py
+# entity最多出现20000次
 entity_count_upper_limit = 20000
 relationship_threshold = 50
 entity_core = 15
