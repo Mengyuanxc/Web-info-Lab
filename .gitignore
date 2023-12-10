@@ -5,3 +5,4 @@ Lab1/recommend/data/*
 Lab1/recommend/示例代码/data/*
 Lab2/stage 1/data/
 Lab2/stage 1/output/*.gz
+Lab2/stage 2/given_code/trained_model/*

@@ -18,12 +18,11 @@ class DataLoaderBase(object):
         self.data_dir = os.path.join(args.data_dir, args.data_name)
         self.train_file = os.path.join(self.data_dir, 'data/train.txt')
         self.test_file = os.path.join(self.data_dir, 'data/test.txt')
-        self.kg_file = os.path.join(self.data_dir, "kg_final.txt")
+        self.kg_file = os.path.join(self.data_dir, "kg_final.csv")
 
         self.cf_train_data, self.train_user_dict = self.load_cf(self.train_file)
         self.cf_test_data, self.test_user_dict = self.load_cf(self.test_file)
         self.statistic_cf()
-
 
     def load_cf(self, filename):
         user = []
@@ -48,19 +47,16 @@ class DataLoaderBase(object):
         item = np.array(item, dtype=np.int32)
         return (user, item), user_dict
 
-
     def statistic_cf(self):
         self.n_users = max(max(self.cf_train_data[0]), max(self.cf_test_data[0])) + 1
         self.n_items = max(max(self.cf_train_data[1]), max(self.cf_test_data[1])) + 1
         self.n_cf_train = len(self.cf_train_data[0])
         self.n_cf_test = len(self.cf_test_data[0])
 
-
     def load_kg(self, filename):
         kg_data = pd.read_csv(filename, names=['h', 'r', 't'], engine='python')
         kg_data = kg_data.drop_duplicates()
         return kg_data
-
 
     def sample_pos_items_for_u(self, user_dict, user_id, n_sample_pos_items):
         pos_items = user_dict[user_id]
@@ -77,7 +73,6 @@ class DataLoaderBase(object):
                 sample_pos_items.append(pos_item_id)
         return sample_pos_items
 
-
     def sample_neg_items_for_u(self, user_dict, user_id, n_sample_neg_items):
         pos_items = user_dict[user_id]
 
@@ -90,7 +85,6 @@ class DataLoaderBase(object):
             if neg_item_id not in pos_items and neg_item_id not in sample_neg_items:
                 sample_neg_items.append(neg_item_id)
         return sample_neg_items
-
 
     def generate_cf_batch(self, user_dict, batch_size):
         exist_users = user_dict.keys()
@@ -110,7 +104,6 @@ class DataLoaderBase(object):
         batch_neg_item = torch.LongTensor(batch_neg_item)
         return batch_user, batch_pos_item, batch_neg_item
 
-
     def sample_pos_triples_for_h(self, kg_dict, head, n_sample_pos_triples):
         pos_triples = kg_dict[head]
         n_pos_triples = len(pos_triples)
@@ -129,7 +122,6 @@ class DataLoaderBase(object):
                 sample_pos_tails.append(tail)
         return sample_relations, sample_pos_tails
 
-
     def sample_neg_triples_for_h(self, kg_dict, head, relation, n_sample_neg_triples, highest_neg_idx):
         pos_triples = kg_dict[head]
 
@@ -143,9 +135,8 @@ class DataLoaderBase(object):
                 sample_neg_tails.append(tail)
         return sample_neg_tails
 
-
     def generate_kg_batch(self, kg_dict, batch_size, highest_neg_idx):
-        exist_heads = kg_dict.keys()
+        exist_heads = list(kg_dict.keys())
         if batch_size <= len(exist_heads):
             batch_head = random.sample(exist_heads, batch_size)
         else:
