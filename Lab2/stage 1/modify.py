@@ -12,7 +12,7 @@ relation = 50
 
 movie_triplet_dict = None
 
-with open("sampled_2step_triplets.json", "r") as f:
+with open("output/sampled_2step_triplets.json", "r") as f:
     movie_triplet_dict = json.load(f)
 
 #统计每一个实体、关系出现次数
@@ -48,7 +48,7 @@ for movie in movie_triplet_dict:
         modify_triplets.append(movie)
 
 print(len(modify_triplets))
-with open("sampled_3step_triplets.json", "w") as f:
+with open("output/sampled_3step_triplets.json", "w") as f:
     json_str = json.dumps(modify_triplets)
     f.write(json_str)
 

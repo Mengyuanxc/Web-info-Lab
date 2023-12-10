@@ -59,7 +59,7 @@ with gzip.open("data/2step.gz", "rb") as f:
                 sampled_triplets.append(triplet)
 
 print(len(sampled_triplets))
-with open("sampled_2step_triplets.json", "w") as f:
+with open("output/sampled_2step_triplets.json", "w") as f:
     json_str = json.dumps(sampled_triplets)
     f.write(json_str)
 

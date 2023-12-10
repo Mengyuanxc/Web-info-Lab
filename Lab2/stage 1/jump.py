@@ -4,7 +4,7 @@ from tqdm import tqdm
 # 第二次jump，根据第一次sample后的三元组集合获取相连的三元组集合
 movie_triplet_dict = None
 
-with open("sampled_movie_triplet_dict.json", "r") as f:
+with open("output/sampled_movie_triplet_dict.json", "r") as f:
     movie_triplet_dict = json.load(f)
 # 找出所有涉及到的entity
 all_entity = set({})

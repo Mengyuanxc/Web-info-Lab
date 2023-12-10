@@ -9,7 +9,7 @@ import pandas as pd
 
 movie_triplet_dict = None
 
-with open("../stage 1/sampled_3step_triplets.json", "r") as f:
+with open("../stage 1/output/sampled_3step_triplets.json", "r") as f:
     movie_triplet_dict = json.load(f)
 
 midToIdmap = {}        

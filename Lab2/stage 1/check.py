@@ -3,12 +3,12 @@ import json
 
 original_movie_triplet_dict = None
 
-with open("movie_triplet_dict.json", "r") as f:
+with open("output/movie_triplet_dict.json", "r") as f:
     original_movie_triplet_dict = json.load(f)
 
 step2_list = None
 step2_triplets = set({})
-with open("sampled_2step_triplets.json", "r") as f:
+with open("output/sampled_2step_triplets.json", "r") as f:
     step2_list = json.load(f)
 
 for triplet in step2_list:

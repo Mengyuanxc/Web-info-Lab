@@ -8,7 +8,7 @@ entity_core = 20
 # 关系数阈值：50
 relationship_threshold = 50
 
-with open("movie_triplet_dict.json", "r") as f:
+with open("output/movie_triplet_dict.json", "r") as f:
     original_dict = json.load(f)
 
 # 记录entity和relationship出现次数
@@ -54,6 +54,6 @@ for movie in original_dict:
 print(entity_count)
 
 # 保存筛选过一次的字典为json文件
-with open("sampled_movie_triplet_dict.json", "w") as file:
+with open("output/sampled_movie_triplet_dict.json", "w") as file:
     json_str = json.dumps(sampled_entity_map)
     file.write(json_str)

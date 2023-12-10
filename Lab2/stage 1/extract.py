@@ -55,6 +55,6 @@ with gzip.open('data/freebase_douban.gz', 'rb') as f:
                 movie_triplet_dict[mid].append(triplet)
 
 # 将dict写入json文件中
-with open("movie_triplet_dict.json", "w") as file:
+with open("output/movie_triplet_dict.json", "w") as file:
     json_str = json.dumps(movie_triplet_dict)
     file.write(json_str)
